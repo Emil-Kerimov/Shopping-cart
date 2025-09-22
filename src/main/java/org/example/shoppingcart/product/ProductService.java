@@ -1,5 +1,6 @@
 package org.example.shoppingcart.product;
 
+import org.example.shoppingcart.exceptions.ProductNotFoundException;
 import org.example.shoppingcart.models.Product;
 import org.example.shoppingcart.repository.ProductRepository;
 
@@ -14,12 +15,15 @@ public class ProductService implements IProductService{
 
     @Override
     public Product getProductById(Long id) {
-        return null;
+        return productRepository.findById(id).
+                orElseThrow(() -> new ProductNotFoundException("Product not found!"));
     }
 
     @Override
     public void deleteProductById(Long id) {
-
+        productRepository.findById(id).
+                ifPresentOrElse(productRepository::delete,
+                        () -> {throw new ProductNotFoundException("Product not found!");});
     }
 
     @Override
