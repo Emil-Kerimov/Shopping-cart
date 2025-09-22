@@ -1,6 +1,7 @@
 package org.example.shoppingcart.service.category;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Category;
 import org.example.shoppingcart.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,13 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public Category getCategoryById(Long id) {
-        return null;
+        return categoryRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Category not found!"));
     }
 
     @Override
     public Category getCategoryByName(String name) {
-        return null;
+        return categoryRepository.findByName(name);
     }
 
     @Override
