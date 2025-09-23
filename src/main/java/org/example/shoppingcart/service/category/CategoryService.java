@@ -7,6 +7,7 @@ import org.example.shoppingcart.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +19,14 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public void deleteCategory(Long id) {
-
+    public void deleteCategoryById(Long id) {
+        categoryRepository.findById(id).ifPresentOrElse(categoryRepository::delete,() ->
+        {throw new ResourceNotFoundException("Category not found");});
     }
 
     @Override
     public List<Category> getAllCategories() {
-        return List.of();
+        return categoryRepository.findAll();
     }
 
     @Override
@@ -39,7 +41,10 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
-    public Category updateCategory(Category category) {
-        return null;
+    public Category updateCategory(Category category, Long id) {
+        return Optional.ofNullable(getCategoryById(id)).map(oldCategory -> {
+            oldCategory.setName(category.getName());
+            return categoryRepository.save(oldCategory);
+        }).orElseThrow(()-> new ResourceNotFoundException("Category not found!"));
     }
 }
