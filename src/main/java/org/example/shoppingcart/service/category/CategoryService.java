@@ -1,6 +1,7 @@
 package org.example.shoppingcart.service.category;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shoppingcart.exceptions.AlreadyExistsException;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Category;
 import org.example.shoppingcart.repository.CategoryRepository;
@@ -15,7 +16,9 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
     @Override
     public Category addCategory(Category category) {
-        return null;
+        return Optional.of(category).filter(c -> categoryRepository.existsByName(c.getName()))
+                .map(categoryRepository :: save)
+                .orElseThrow(() -> new AlreadyExistsException(category.getName() + " already exists"));
     }
 
     @Override
