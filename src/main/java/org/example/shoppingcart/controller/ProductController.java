@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Product;
 import org.example.shoppingcart.request.AddProductRequest;
+import org.example.shoppingcart.request.ProductUpdateRequest;
 import org.example.shoppingcart.response.ApiResponse;
 import org.example.shoppingcart.service.product.IProductService;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,16 @@ public class ProductController {
             return  ResponseEntity.ok(new ApiResponse("Add product success", theProduct));
         } catch (Exception e) {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(),null));
+        }
+    }
+
+    @PutMapping("/product/{productId}/update")
+    public ResponseEntity<ApiResponse> updateProduct(@RequestBody ProductUpdateRequest request, @PathVariable Long productId) {
+        try {
+            Product theProduct = productService.updateProduct(request, productId);
+            return ResponseEntity.ok(new ApiResponse("Update product success", theProduct));
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }
 }
