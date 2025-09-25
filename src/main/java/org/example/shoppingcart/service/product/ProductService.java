@@ -2,6 +2,7 @@ package org.example.shoppingcart.service.product;
 
 import lombok.RequiredArgsConstructor;
 import org.example.shoppingcart.exceptions.ProductNotFoundException;
+import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Category;
 import org.example.shoppingcart.models.Product;
 import org.example.shoppingcart.repository.CategoryRepository;
@@ -45,14 +46,14 @@ public class ProductService implements IProductService{
     @Override
     public Product getProductById(Long id) {
         return productRepository.findById(id).
-                orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+                orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
     }
 
     @Override
     public void deleteProductById(Long id) {
         productRepository.findById(id).
                 ifPresentOrElse(productRepository::delete,
-                        () -> {throw new ProductNotFoundException("Product not found!");});
+                        () -> {throw new ResourceNotFoundException("Product not found!");});
     }
 
     @Override
@@ -60,7 +61,7 @@ public class ProductService implements IProductService{
         return productRepository.findById(productId)
                 .map(existingProduct -> updateExistingProduct(existingProduct, request))
                 .map(productRepository :: save)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found!"));
     }
 
     private Product updateExistingProduct(Product existingProduct, ProductUpdateRequest request) {
