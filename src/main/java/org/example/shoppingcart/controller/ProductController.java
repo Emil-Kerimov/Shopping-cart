@@ -7,7 +7,6 @@ import org.example.shoppingcart.request.AddProductRequest;
 import org.example.shoppingcart.request.ProductUpdateRequest;
 import org.example.shoppingcart.response.ApiResponse;
 import org.example.shoppingcart.service.product.IProductService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,7 +68,7 @@ public class ProductController {
     }
 
     @GetMapping("products//by/brand-and-name")
-    public ResponseEntity<ApiResponse> getProductByBrandAndName(@PathVariable String brandName, @PathVariable String productName) {
+    public ResponseEntity<ApiResponse> getProductByBrandAndName(@RequestParam String brandName, @RequestParam String productName) {
         try {
             List<Product> products = productService.getProductsByBrandAndName(brandName, productName);
             if(products.isEmpty()) {
@@ -86,7 +85,7 @@ public class ProductController {
         try {
             List<Product> products = productService.getProductsByCategoryAndBrand(category, brand);
             if(products.isEmpty()) {
-                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Product not found", null));
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products not found", null));
             }
             return ResponseEntity.ok(new ApiResponse("success", products));
         } catch (Exception e) {
@@ -94,5 +93,42 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/products/{name}/products")
+    public ResponseEntity<ApiResponse> getProductByName(@PathVariable String name) {
+        try {
+            List<Product> products = productService.getProductByName(name);
+            if(products.isEmpty()) {
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products not found", null));
+            }
+            return ResponseEntity.ok(new ApiResponse("success", products));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse("error",e.getMessage()));
+        }
+    }
 
+    @GetMapping("/product/by-brand")
+    public ResponseEntity<ApiResponse> getProductByBrand(@RequestParam String brand) {
+        try {
+            List<Product> products = productService.getProductsByBrand(brand);
+            if(products.isEmpty()) {
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products not found", null));
+            }
+            return ResponseEntity.ok(new ApiResponse("success", products));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/products/{category}/all/products")
+    public ResponseEntity<ApiResponse> getProductByCategory(@PathVariable String category) {
+        try {
+            List<Product> products = productService.getProductsByCategory(category);
+            if(products.isEmpty()) {
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Products not found", null));
+            }
+            return ResponseEntity.ok(new ApiResponse("success", products));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponse(e.getMessage(), null));
+        }
+    }
 }
