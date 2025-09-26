@@ -80,4 +80,19 @@ public class ProductController {
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(),null));
         }
     }
+
+    @GetMapping("products//by/category-and-brand")
+    public ResponseEntity<ApiResponse> getProductByCategoryAndBrand(@RequestParam String category, @RequestParam String brand) {
+        try {
+            List<Product> products = productService.getProductsByCategoryAndBrand(category, brand);
+            if(products.isEmpty()) {
+                return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Product not found", null));
+            }
+            return ResponseEntity.ok(new ApiResponse("success", products));
+        } catch (Exception e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(),null));
+        }
+    }
+
+
 }
