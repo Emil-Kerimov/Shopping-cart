@@ -131,4 +131,15 @@ public class ProductController {
             return ResponseEntity.ok(new ApiResponse(e.getMessage(), null));
         }
     }
+
+    @GetMapping("/product/count/by-brand/and-name")
+    public ResponseEntity<ApiResponse> countProductsBrandAndName(@RequestParam String brand, @RequestParam String name) {
+        try {
+            var productCount =  productService.countProductsByBrandAndName(brand, name);
+            return ResponseEntity.ok(new ApiResponse("Product count", productCount));
+        } catch (Exception e) {
+            return ResponseEntity.ok(new ApiResponse(e.getMessage(), null));
+        }
+    }
+
 }
