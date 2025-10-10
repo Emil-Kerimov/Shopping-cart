@@ -31,7 +31,7 @@ public class ProductService implements IProductService{
         //check if the category is found in the DB
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
-                    Category newCategory = new Category();
+                    Category newCategory = new Category(request.getCategory().getName());
                     return categoryRepository.save(newCategory);
                 });
         request.setCategory(category);
