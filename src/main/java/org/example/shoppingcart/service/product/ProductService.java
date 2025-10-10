@@ -118,6 +118,11 @@ public class ProductService implements IProductService{
     }
 
     @Override
+    public List<ProductDto> getConvertedProducts(List<Product> products) {
+        return products.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
     public ProductDto convertToDto(Product product) {
         ProductDto productDto = modelMapper.map(product, ProductDto.class);
         List<Image> images = imageRepository.findByProductId(product.getId());

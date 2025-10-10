@@ -1,6 +1,7 @@
 package org.example.shoppingcart.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shoppingcart.dto.ProductDto;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Product;
 import org.example.shoppingcart.request.AddProductRequest;
@@ -24,7 +25,8 @@ public class ProductController {
     @GetMapping("/all")
     public ResponseEntity<ApiResponse> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(new ApiResponse("success", products));
+        List<ProductDto> convertedProducts = productService.getConvertedProducts(products);
+        return ResponseEntity.ok(new ApiResponse("success", convertedProducts));
     }
 
     @GetMapping("/product/{productId}/product")
