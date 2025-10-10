@@ -1,14 +1,18 @@
 package org.example.shoppingcart.service.product;
 
 import lombok.RequiredArgsConstructor;
-import org.example.shoppingcart.exceptions.ProductNotFoundException;
+import org.example.shoppingcart.dto.ImageDto;
+import org.example.shoppingcart.dto.ProductDto;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Category;
+import org.example.shoppingcart.models.Image;
 import org.example.shoppingcart.models.Product;
 import org.example.shoppingcart.repository.CategoryRepository;
+import org.example.shoppingcart.repository.ImageRepository;
 import org.example.shoppingcart.repository.ProductRepository;
 import org.example.shoppingcart.request.AddProductRequest;
 import org.example.shoppingcart.request.ProductUpdateRequest;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +23,15 @@ import java.util.Optional;
 public class ProductService implements IProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
     @Override
     public Product addProduct(AddProductRequest request) {
         //check if the category is found in the DB
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
-                    Category newCategory = new Category();
+                    Category newCategory = new Category(request.getCategory().getName());
                     return categoryRepository.save(newCategory);
                 });
         request.setCategory(category);
@@ -109,5 +115,21 @@ public class ProductService implements IProductService{
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+    @Override
+    public List<ProductDto> getConvertedProducts(List<Product> products) {
+        return products.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public ProductDto convertToDto(Product product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<Image> images = imageRepository.findByProductId(product.getId());
+        List<ImageDto> imageDtos = images.stream()
+                .map(image -> modelMapper.map(image, ImageDto.class))
+                .toList();
+        productDto.setImages((imageDtos));
+        return productDto;
     }
 }
