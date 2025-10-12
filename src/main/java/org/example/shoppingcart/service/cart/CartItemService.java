@@ -1,6 +1,7 @@
 package org.example.shoppingcart.service.cart;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Cart;
 import org.example.shoppingcart.models.CartItem;
 import org.example.shoppingcart.models.Product;
@@ -42,7 +43,13 @@ public class CartItemService implements ICartItemService {
 
     @Override
     public void removeItemFromCart(Long cartId, Long productId) {
-
+        Cart cart = cartService.getCart(cartId);
+        CartItem itemToRemove = cart.getItems()
+                .stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst().orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        cart.removeItem(itemToRemove);
+        cartRepository.save(cart);
     }
 
     @Override
