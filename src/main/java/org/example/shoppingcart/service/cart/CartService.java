@@ -6,6 +6,7 @@ import org.example.shoppingcart.models.Cart;
 import org.example.shoppingcart.repository.CartItemRepository;
 import org.example.shoppingcart.repository.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,6 +18,7 @@ public class CartService implements ICartService {
     private final CartItemRepository cartItemRepository;
     private final AtomicLong cartIdGenerator = new AtomicLong(0);
 
+    @Transactional
     @Override
     public void clearCart(Long id) {
         Cart cart = getCart(id);
