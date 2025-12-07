@@ -1,6 +1,7 @@
 package org.example.shoppingcart.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.shoppingcart.dto.OrderDto;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Order;
 import org.example.shoppingcart.response.ApiResponse;
@@ -31,7 +32,7 @@ public class OrderController {
     @GetMapping("/{orderId}/order")
     public ResponseEntity<ApiResponse> getOrderByID(@PathVariable Long orderId) {
         try {
-            Order order = orderService.getOrder(orderId);
+            OrderDto order = orderService.getOrder(orderId);
             return ResponseEntity.ok(new ApiResponse("Order found successfully", order));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Order not found!", e.getMessage()));
@@ -41,7 +42,7 @@ public class OrderController {
     @GetMapping("/{userId}/orders")
     public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Long userId) {
         try {
-            List<Order> orders = orderService.getUserOrders(userId);
+            List<OrderDto> orders = orderService.getUserOrders(userId);
             return ResponseEntity.ok(new ApiResponse("Orders found successfully", orders));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Orders not found!", e.getMessage()));

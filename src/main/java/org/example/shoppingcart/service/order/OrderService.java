@@ -2,6 +2,7 @@ package org.example.shoppingcart.service.order;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.example.shoppingcart.dto.OrderDto;
 import org.example.shoppingcart.enums.OrderStatus;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Cart;
@@ -11,6 +12,7 @@ import org.example.shoppingcart.models.Product;
 import org.example.shoppingcart.repository.OrderRepository;
 import org.example.shoppingcart.repository.ProductRepository;
 import org.example.shoppingcart.service.cart.CartService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final CartService cartService;
+    private final ModelMapper modelMapper;
 
     @Transactional
     @Override
@@ -71,13 +74,21 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order getOrder(Long orderId) {
+    public OrderDto getOrder(Long orderId) {
         return orderRepository.findById(orderId)
+                .map(this :: convertToDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
     }
 
     @Override
-    public List<Order> getUserOrders(Long userId) {
-        return orderRepository.findByUserId(userId);
+    public List<OrderDto> getUserOrders(Long userId) {
+        return orderRepository.findByUserId(userId)
+                .stream()
+                .map(this :: convertToDto)
+                .toList();
+    }
+
+    private OrderDto convertToDto(Order order){
+        return modelMapper.map(order, OrderDto.class);
     }
 }
