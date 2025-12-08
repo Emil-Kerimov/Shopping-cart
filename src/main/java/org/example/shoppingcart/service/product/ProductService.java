@@ -3,6 +3,7 @@ package org.example.shoppingcart.service.product;
 import lombok.RequiredArgsConstructor;
 import org.example.shoppingcart.dto.ImageDto;
 import org.example.shoppingcart.dto.ProductDto;
+import org.example.shoppingcart.exceptions.AlreadyExistsException;
 import org.example.shoppingcart.exceptions.ResourceNotFoundException;
 import org.example.shoppingcart.models.Category;
 import org.example.shoppingcart.models.Image;
@@ -29,6 +30,10 @@ public class ProductService implements IProductService{
     @Override
     public Product addProduct(AddProductRequest request) {
         //check if the category is found in the DB
+
+        if(productExists(request.getName(), request.getBrand())){
+            throw new AlreadyExistsException(request.getBrand() + " with name " + request.getName()+" already exists");
+        }
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
                     Category newCategory = new Category(request.getCategory().getName());
@@ -37,6 +42,10 @@ public class ProductService implements IProductService{
         request.setCategory(category);
         return productRepository.save(createProduct(request
         , category));
+    }
+
+    private boolean productExists(String name,String brand) {
+        return productRepository.existsByNameAndBrand(name, brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category) {
