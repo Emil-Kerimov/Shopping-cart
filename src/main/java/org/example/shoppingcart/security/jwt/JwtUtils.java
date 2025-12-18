@@ -1,4 +1,4 @@
-package org.example.shoppingcart.security.JWT;
+package org.example.shoppingcart.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
