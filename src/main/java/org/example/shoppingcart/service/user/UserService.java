@@ -9,6 +9,9 @@ import org.example.shoppingcart.repository.UserRepository;
 import org.example.shoppingcart.request.CreateUserRequest;
 import org.example.shoppingcart.request.UserUpdateRequest;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,6 +21,8 @@ import java.util.Optional;
 public class UserService implements IUserService{
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
@@ -31,7 +36,7 @@ public class UserService implements IUserService{
                         .map(userRequest  ->{
                             User user = new User();
                             user.setEmail(userRequest.getEmail());
-                            user.setPassword(userRequest.getPassword());
+                            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
                             user.setFirstName(userRequest.getFirstName());
                             user.setLastName(userRequest.getLastName());
                             return userRepository.save(user);
@@ -57,5 +62,12 @@ public class UserService implements IUserService{
     @Override
     public UserDto convertUserToDto(User user) {
         return modelMapper.map(user, UserDto.class);
+    }
+
+    @Override
+    public User getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email);
     }
 }
